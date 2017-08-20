@@ -57,10 +57,10 @@ export default class NikeClient {
             "grant_type":"password"
         };
         let that = this;
+        
         return this.httpClient.Post(uri, null, data)        
         .then((data) => {
             that.loginData = JSON.parse(data);
-            console.log('access_token = ', that.loginData.access_token);
         })
         .catch((err) => {
             that.loginData = null;
