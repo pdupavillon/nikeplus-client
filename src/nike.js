@@ -61,6 +61,7 @@ export default class NikeClient {
         return this.httpClient.Post(uri, null, data)        
         .then((data) => {
             that.loginData = JSON.parse(data);
+            return Promise.resolve(that.loginData);
         })
         .catch((err) => {
             that.loginData = null;
