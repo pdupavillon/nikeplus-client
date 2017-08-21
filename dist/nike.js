@@ -101,6 +101,14 @@ var NikeClient = function () {
             });
         }
     }, {
+        key: 'login_data',
+        value: function login_data(data) {
+            if (!data || !data.access_token || !data.refresh_token) {
+                throw 'Invalid login data';
+            }
+            this.login_data = data;
+        }
+    }, {
         key: 'refresh_token',
         value: function refresh_token() {
             var _this2 = this;

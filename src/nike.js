@@ -67,6 +67,12 @@ export default class NikeClient {
             throw 'Can\'t log in ' + err;
         });
     }
+    login_data(data){
+        if (!data || !data.access_token || !data.refresh_token){
+            throw 'Invalid login data';
+        }
+        this.login_data = data;
+    }
     refresh_token(){
         const uri = 'https://unite.nike.com/tokenRefresh?appVersion=296&experienceVersion=257&uxid=com.nike.commerce.nikedotcom.web&backendEnvironment=identity&browser=Google%20Inc.&os=undefined&mobile=false&native=false&visit=&visitor='; //locale=en_US
         const data = {
