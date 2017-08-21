@@ -19,8 +19,8 @@ export default class NikeClient {
         this.refreshTokenAsked = false;
         return Promise.resolve({error:null, data:JSON.parse(data)});
     }
-    _Get(path, headers = null, queryString = ''){
-        const cb = this._Get.bind(this, path,headers, queryString);
+    _Get(uri, headers = null){
+        const cb = this._Get.bind(this, uri, headers);
         
         return this.httpClient.Get(uri, headers)
         .then((data) => this._handleResponse(data))
@@ -29,13 +29,13 @@ export default class NikeClient {
     _GetWithAuthQueryString(path, queryString = ''){
         const uri = 'https://api.nike.com'+path+'?access_token='+this.loginData.access_token+'&app=FUELBAND&format=json'+queryString; //locale=en_FR
         
-        return this._Get(uri, null, queryString);
+        return this._Get(uri);
     }
     _GetWithAuthInHeader(path, queryString = ''){
         const headers = { 'Authorization': 'Bearer ' + this.loginData.access_token };
         const uri = 'https://api.nike.com'+path+'?format=json' + queryString;
 
-        return this._Get(uri, headers, queryString);
+        return this._Get(uri, headers);
     }
 
     /**

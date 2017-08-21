@@ -40,13 +40,12 @@ var NikeClient = function () {
         }
     }, {
         key: '_Get',
-        value: function _Get(path) {
+        value: function _Get(uri) {
             var _this = this;
 
             var headers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-            var queryString = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
 
-            var cb = this._Get.bind(this, path, headers, queryString);
+            var cb = this._Get.bind(this, uri, headers);
 
             return this.httpClient.Get(uri, headers).then(function (data) {
                 return _this._handleResponse(data);
@@ -61,7 +60,7 @@ var NikeClient = function () {
 
             var uri = 'https://api.nike.com' + path + '?access_token=' + this.loginData.access_token + '&app=FUELBAND&format=json' + queryString; //locale=en_FR
 
-            return this._Get(uri, null, queryString);
+            return this._Get(uri);
         }
     }, {
         key: '_GetWithAuthInHeader',
@@ -71,7 +70,7 @@ var NikeClient = function () {
             var headers = { 'Authorization': 'Bearer ' + this.loginData.access_token };
             var uri = 'https://api.nike.com' + path + '?format=json' + queryString;
 
-            return this._Get(uri, headers, queryString);
+            return this._Get(uri, headers);
         }
 
         /**
@@ -93,9 +92,9 @@ var NikeClient = function () {
                 "grant_type": "password"
             };
             var that = this;
+
             return this.httpClient.Post(uri, null, data).then(function (data) {
                 that.loginData = JSON.parse(data);
-                console.log('access_token = ', that.loginData.access_token);
             }).catch(function (err) {
                 that.loginData = null;
                 throw 'Can\'t log in ' + err;
