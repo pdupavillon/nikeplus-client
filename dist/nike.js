@@ -95,6 +95,7 @@ var NikeClient = function () {
 
             return this.httpClient.Post(uri, null, data).then(function (data) {
                 that.loginData = JSON.parse(data);
+                return Promise.resolve(that.loginData);
             }).catch(function (err) {
                 that.loginData = null;
                 throw 'Can\'t log in ' + err;
