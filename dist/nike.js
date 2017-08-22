@@ -107,7 +107,7 @@ var NikeClient = function () {
             if (!data || !data.access_token || !data.refresh_token) {
                 throw 'Invalid login data';
             }
-            this.login_data = data;
+            this.loginData = data;
         }
     }, {
         key: 'refresh_token',
