@@ -19,23 +19,25 @@ export default class NikeClient {
         this.refreshTokenAsked = false;
         return Promise.resolve({error:null, data:JSON.parse(data)});
     }
-    _Get(uri, headers = null){
-        const cb = this._Get.bind(this, uri, headers);
-        
-        return this.httpClient.Get(uri, headers)
-        .then((data) => this._handleResponse(data))
-        .catch((err) => this._handleRefreshToken(err, cb));        
+    _Get(uri, headers = null){        
+        return  this.httpClient
+                    .Get(uri, headers)
+                    .then((data) => this._handleResponse(data));
     }
     _GetWithAuthQueryString(path, queryString = ''){
-        const uri = 'https://api.nike.com'+path+'?access_token='+this.loginData.access_token+'&app=FUELBAND&format=json'+queryString; //locale=en_FR
-        
-        return this._Get(uri);
+        const uri = 'https://api.nike.com'+path+'?access_token='+this.loginData.access_token+'&app=FUELBAND&format=json'+queryString; //locale=en_FR        
+        const cb = this._GetWithAuthQueryString.bind(this, path, queryString);
+
+        return  this._Get(uri)
+                    .catch((err) => this._handleRefreshToken(err, cb));        
     }
     _GetWithAuthInHeader(path, queryString = ''){
         const headers = { 'Authorization': 'Bearer ' + this.loginData.access_token };
         const uri = 'https://api.nike.com'+path+'?format=json' + queryString;
+        const cb = this._GetWithAuthInHeader.bind(this, path, queryString);
 
-        return this._Get(uri, headers);
+        return  this._Get(uri, headers)
+                    .catch((err) => this._handleRefreshToken(err, cb));        
     }
 
     /**
@@ -83,7 +85,10 @@ export default class NikeClient {
         };
         this.refreshTokenAsked = true;        
         return this.httpClient.Post(uri, null, data)
-                .then((data) => this.loginData = JSON.parse(data));
+                .then((data) => {
+                    this.loginData = JSON.parse(data)
+                    return Promise.resolve()
+                })
     }
     me_summary(){
         this._shouldBeLogged();
