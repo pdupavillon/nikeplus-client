@@ -1,50 +1,46 @@
 export default class NikeClient {
     constructor(httpClient){
-        this.loginData = null;
-        this.httpClient = httpClient;
-        this.refreshTokenAsked = false;
+        this._httpClient = httpClient
+        this._refreshTokenAsked = false
+        this._tokenRefreshed = false
+        this.authData = null
     }
     _shouldBeLogged(){
-        if (this.loginData === null){
+        if (this.authData === null){
             throw 'You are not logged in';
         }
+        this._tokenRefreshed = false;
     }
     _handleRefreshToken(err, cb){
-        if (err.statusCode === 401 && !this.refreshTokenAsked){
+        if (err.statusCode === 401 && !this._refreshTokenAsked){
             return this.refresh_token().then(cb);
         }
         return Promise.reject({error: err, data:null});
     }
     _handleResponse(data){
-        this.refreshTokenAsked = false;
+        this._refreshTokenAsked = false;
         return Promise.resolve({error:null, data:JSON.parse(data)});
     }
     _Get(uri, headers = null){        
-        return  this.httpClient
+        return  this._httpClient
                     .Get(uri, headers)
                     .then((data) => this._handleResponse(data));
     }
     _GetWithAuthQueryString(path, queryString = ''){
-        const uri = 'https://api.nike.com'+path+'?access_token='+this.loginData.access_token+'&app=FUELBAND&format=json'+queryString; //locale=en_FR        
+        const uri = 'https://api.nike.com'+path+'?access_token='+this.authData.access_token+'&app=FUELBAND&format=json'+queryString; //locale=en_FR        
         const cb = this._GetWithAuthQueryString.bind(this, path, queryString);
 
         return  this._Get(uri)
                     .catch((err) => this._handleRefreshToken(err, cb));        
     }
     _GetWithAuthInHeader(path, queryString = ''){
-        const headers = { 'Authorization': 'Bearer ' + this.loginData.access_token };
+        const headers = { 'Authorization': 'Bearer ' + this.authData.access_token };
         const uri = 'https://api.nike.com'+path+'?format=json' + queryString;
         const cb = this._GetWithAuthInHeader.bind(this, path, queryString);
 
         return  this._Get(uri, headers)
                     .catch((err) => this._handleRefreshToken(err, cb));        
     }
-
-    /**
-     * @param {string} email 
-     * @param {string} password 
-     * @memberof NikeClient
-     */
     login(email, password){
         const uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=295'+
                     '&experienceVersion=256&uxid=com.nike.commerce.nikedotcom.web'+
@@ -60,35 +56,39 @@ export default class NikeClient {
         };
         let that = this;
         
-        return this.httpClient.Post(uri, null, data)        
+        return this._httpClient.Post(uri, null, data)        
         .then((data) => {
-            that.loginData = JSON.parse(data);
-            return Promise.resolve(that.loginData);
+            that.authData = JSON.parse(data);
+            return Promise.resolve(that.authData);
         })
         .catch((err) => {
-            that.loginData = null;
+            that.authData = null;
             throw 'Can\'t log in ' + err;
         });
     }
-    login_data(data){
+    set_auth(data){
         if (!data || !data.access_token || !data.refresh_token){
             throw 'Invalid login data';
         }
-        this.loginData = data;
+        this.authData = data;
     }
     refresh_token(){
         const uri = 'https://unite.nike.com/tokenRefresh?appVersion=296&experienceVersion=257&uxid=com.nike.commerce.nikedotcom.web&backendEnvironment=identity&browser=Google%20Inc.&os=undefined&mobile=false&native=false&visit=&visitor='; //locale=en_US
         const data = {
             client_id: 'HlHa2Cje3ctlaOqnxvgZXNaAs7T9nAuH',
             grant_type: 'refresh_token',
-            refresh_token: this.loginData.refresh_token
+            refresh_token: this.authData.refresh_token
         };
-        this.refreshTokenAsked = true;        
-        return this.httpClient.Post(uri, null, data)
-                .then((data) => {
-                    this.loginData = JSON.parse(data)
-                    return Promise.resolve()
-                })
+        let that = this;
+        this._refreshTokenAsked = true;
+
+        return  this._httpClient
+                    .Post(uri, null, data)
+                    .then((data) => {
+                        that._tokenRefreshed = true;
+                        that.authData = JSON.parse(data)
+                        return Promise.resolve()
+                    })
     }
     me_summary(){
         this._shouldBeLogged();

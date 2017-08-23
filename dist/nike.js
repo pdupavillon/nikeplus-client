@@ -12,22 +12,24 @@ var NikeClient = function () {
     function NikeClient(httpClient) {
         _classCallCheck(this, NikeClient);
 
-        this.loginData = null;
-        this.httpClient = httpClient;
-        this.refreshTokenAsked = false;
+        this._httpClient = httpClient;
+        this._refreshTokenAsked = false;
+        this._tokenRefreshed = false;
+        this.authData = null;
     }
 
     _createClass(NikeClient, [{
         key: '_shouldBeLogged',
         value: function _shouldBeLogged() {
-            if (this.loginData === null) {
+            if (this.authData === null) {
                 throw 'You are not logged in';
             }
+            this._tokenRefreshed = false;
         }
     }, {
         key: '_handleRefreshToken',
         value: function _handleRefreshToken(err, cb) {
-            if (err.statusCode === 401 && !this.refreshTokenAsked) {
+            if (err.statusCode === 401 && !this._refreshTokenAsked) {
                 return this.refresh_token().then(cb);
             }
             return Promise.reject({ error: err, data: null });
@@ -35,7 +37,7 @@ var NikeClient = function () {
     }, {
         key: '_handleResponse',
         value: function _handleResponse(data) {
-            this.refreshTokenAsked = false;
+            this._refreshTokenAsked = false;
             return Promise.resolve({ error: null, data: JSON.parse(data) });
         }
     }, {
@@ -45,7 +47,7 @@ var NikeClient = function () {
 
             var headers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
-            return this.httpClient.Get(uri, headers).then(function (data) {
+            return this._httpClient.Get(uri, headers).then(function (data) {
                 return _this._handleResponse(data);
             });
         }
@@ -56,7 +58,7 @@ var NikeClient = function () {
 
             var queryString = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
-            var uri = 'https://api.nike.com' + path + '?access_token=' + this.loginData.access_token + '&app=FUELBAND&format=json' + queryString; //locale=en_FR        
+            var uri = 'https://api.nike.com' + path + '?access_token=' + this.authData.access_token + '&app=FUELBAND&format=json' + queryString; //locale=en_FR        
             var cb = this._GetWithAuthQueryString.bind(this, path, queryString);
 
             return this._Get(uri).catch(function (err) {
@@ -70,7 +72,7 @@ var NikeClient = function () {
 
             var queryString = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
-            var headers = { 'Authorization': 'Bearer ' + this.loginData.access_token };
+            var headers = { 'Authorization': 'Bearer ' + this.authData.access_token };
             var uri = 'https://api.nike.com' + path + '?format=json' + queryString;
             var cb = this._GetWithAuthInHeader.bind(this, path, queryString);
 
@@ -78,13 +80,6 @@ var NikeClient = function () {
                 return _this3._handleRefreshToken(err, cb);
             });
         }
-
-        /**
-         * @param {string} email 
-         * @param {string} password 
-         * @memberof NikeClient
-         */
-
     }, {
         key: 'login',
         value: function login(email, password) {
@@ -99,36 +94,37 @@ var NikeClient = function () {
             };
             var that = this;
 
-            return this.httpClient.Post(uri, null, data).then(function (data) {
-                that.loginData = JSON.parse(data);
-                return Promise.resolve(that.loginData);
+            return this._httpClient.Post(uri, null, data).then(function (data) {
+                that.authData = JSON.parse(data);
+                return Promise.resolve(that.authData);
             }).catch(function (err) {
-                that.loginData = null;
+                that.authData = null;
                 throw 'Can\'t log in ' + err;
             });
         }
     }, {
-        key: 'login_data',
-        value: function login_data(data) {
+        key: 'set_auth',
+        value: function set_auth(data) {
             if (!data || !data.access_token || !data.refresh_token) {
                 throw 'Invalid login data';
             }
-            this.loginData = data;
+            this.authData = data;
         }
     }, {
         key: 'refresh_token',
         value: function refresh_token() {
-            var _this4 = this;
-
             var uri = 'https://unite.nike.com/tokenRefresh?appVersion=296&experienceVersion=257&uxid=com.nike.commerce.nikedotcom.web&backendEnvironment=identity&browser=Google%20Inc.&os=undefined&mobile=false&native=false&visit=&visitor='; //locale=en_US
             var data = {
                 client_id: 'HlHa2Cje3ctlaOqnxvgZXNaAs7T9nAuH',
                 grant_type: 'refresh_token',
-                refresh_token: this.loginData.refresh_token
+                refresh_token: this.authData.refresh_token
             };
-            this.refreshTokenAsked = true;
-            return this.httpClient.Post(uri, null, data).then(function (data) {
-                _this4.loginData = JSON.parse(data);
+            var that = this;
+            this._refreshTokenAsked = true;
+
+            return this._httpClient.Post(uri, null, data).then(function (data) {
+                that._tokenRefreshed = true;
+                that.authData = JSON.parse(data);
                 return Promise.resolve();
             });
         }
