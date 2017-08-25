@@ -162,7 +162,7 @@ var NikeClient = function () {
         key: 'me_activities_year',
         value: function me_activities_year(startTime, endTime) {
             this._shouldBeLogged();
-            return this._GetWithAuthQueryString('/v3.0/me/activities', '&startTime=' + startTime + '&endTime' + endTime); //1501459200000  1503100194141 //&isStream=0
+            return this._GetWithAuthQueryString('/v3.0/me/activities', '&startTime=' + startTime + '&endTime=' + endTime); //1501459200000  1503100194141 //&isStream=0
         }
     }, {
         key: 'me_activities_run_daily',
@@ -170,6 +170,24 @@ var NikeClient = function () {
             //2017-08-14   2017-08-21
             this._shouldBeLogged();
             return this._GetWithAuthInHeader('/plus/v3/historicalaggregates/aggregates/batch/daily/' + fromDate + '/' + toDate, '&metric_type=distance&activity_type=jogging&activity_type=run');
+        }
+    }, {
+        key: 'me_activities_before_id',
+        value: function me_activities_before_id(id, limit, metrics, types) {
+            //metrics=distance,pace
+            limit = limit || 10;
+            this._shouldBeLogged();
+            return this._GetWithAuthInHeader('/sport/v3/me/activities/before_id/' + id, '&limit=' + limit + '&metrics=distance&types=jogging,run');
+        }
+        //https://api.nike.com/sport/v3/me/activities/before_time/1503507694194?types=jogging,run&limit=1    
+
+    }, {
+        key: 'me_activities_before_time',
+        value: function me_activities_before_time(time, limit, metrics, types) {
+            //time = 1503507694194, types = jogging,run
+            limit = limit || 1;
+            this._shouldBeLogged();
+            return this._GetWithAuthInHeader('/sport/v3/me/activities/before_time/' + id, '&limit=' + limit + '&types=jogging,run');
         }
     }, {
         key: 'me_activity_detail',
