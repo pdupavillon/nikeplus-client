@@ -187,7 +187,7 @@ var NikeClient = function () {
             //time = 1503507694194, types = jogging,run
             limit = limit || 1;
             this._shouldBeLogged();
-            return this._GetWithAuthInHeader('/sport/v3/me/activities/before_time/' + id, '&limit=' + limit + '&types=jogging,run');
+            return this._GetWithAuthInHeader('/sport/v3/me/activities/before_time/' + time, '&limit=' + limit + '&types=jogging,run');
         }
     }, {
         key: 'me_activity_detail',
