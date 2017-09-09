@@ -120,14 +120,25 @@ export default class NikeClient {
     }
     me_activities_before_id(id, limit, metrics, types){//metrics=distance,pace
         limit = limit || 10
+        types = types || 'run'
+        let qs = '&limit='+limit
+        
+        if (metrics){ qs += '&metrics='+metrics}
+        if (types){ qs += '&types='+types}
+        
         this._shouldBeLogged();
-        return this._GetWithAuthInHeader('/sport/v3/me/activities/before_id/'+id,'&limit='+limit+'&metrics=distance&types=jogging,run');
+        return this._GetWithAuthInHeader('/sport/v3/me/activities/before_id/'+id, qs);
     }
     //https://api.nike.com/sport/v3/me/activities/before_time/1503507694194?types=jogging,run&limit=1    
     me_activities_before_time(time,limit, metrics, types){//time = 1503507694194, types = jogging,run
         limit = limit || 1
+        types = types || 'run'
+        let qs = '&limit='+limit
+
+        if (metrics){ qs += '&metrics='+metrics}
+        if (types){ qs += '&types='+types}
         this._shouldBeLogged();
-        return this._GetWithAuthInHeader('/sport/v3/me/activities/before_time/'+time, '&limit='+limit+'&types=jogging,run');
+        return this._GetWithAuthInHeader('/sport/v3/me/activities/before_time/'+time, qs);
     }
     me_activity_detail(id){
         this._shouldBeLogged();
