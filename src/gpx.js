@@ -18,7 +18,6 @@ export default class Gpx {
                 }
             }
         }
-        let lines = ''
         const elevations = res.data.metrics.filter((val, index) => val.type === 'elevation')[0]
         const latitudes = res.data.metrics.filter((val, index) => val.type === 'latitude')[0]
         const longitudes = res.data.metrics.filter((val, index) => val.type === 'longitude')[0]
