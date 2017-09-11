@@ -74,7 +74,7 @@ var Tcx = function () {
             }
           },
           Author: {
-            '@xsi:type=': 'Application_t',
+            '@xsi:type': 'Application_t',
             Name: 'Paul du Pavillon - https://nike.bullrox.net',
             Build: {
               Version: {
