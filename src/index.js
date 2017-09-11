@@ -1,3 +1,3 @@
-import NikeClient from 'nike';
+import NikeClient from './nike';
 
 export default NikeClient;
