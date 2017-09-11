@@ -50,7 +50,7 @@ var Tcx = function () {
           Activities: {
             Activity: {
               '@Sport': 'Running',
-              'Notes': 'Uploaded by : nike.bullrox.net',
+              'Notes': 'Generated on : nike.bullrox.net',
               Id: new Date(res.data.start_epoch_ms).toISOString(),
               Lap: {
                 TotalTimeSeconds: res.data.active_duration_ms,
@@ -61,7 +61,7 @@ var Tcx = function () {
                   return s.value;
                 }).reduce(function (prev, next) {
                   return Math.max(prev, next);
-                }) * 1000,
+                }) * 0.277778, //km/h --> m/s
                 Calories: res.data.summaries.filter(function (s) {
                   return s.metric === 'calories';
                 })[0].value * 1000,

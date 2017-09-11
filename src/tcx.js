@@ -20,12 +20,12 @@ export default class Tcx {
         Activities: {
           Activity: {
             '@Sport': 'Running',
-            'Notes': 'Uploaded by : nike.bullrox.net',
+            'Notes': 'Generated on : nike.bullrox.net',
             Id: new Date(res.data.start_epoch_ms).toISOString(),
             Lap: {
               TotalTimeSeconds: res.data.active_duration_ms,
               DistanceMeters: res.data.summaries.filter((s) => s.metric === 'distance')[0].value * 1000,
-              MaximumSpeed: speeds.values.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 1000,
+              MaximumSpeed: speeds.values.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 0.277778, //km/h --> m/s
               Calories: res.data.summaries.filter((s) => s.metric === 'calories')[0].value * 1000,
               Intensity: 'Active',
               TriggerMethod: 'Manual',
