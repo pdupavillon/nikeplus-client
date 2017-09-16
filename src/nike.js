@@ -2,11 +2,11 @@ import Gpx from './gpx'
 import Tcx from './tcx'
 
 export default class NikeClient {
-  constructor(httpClient) {
+  constructor(httpClient, auth) {
     this._httpClient = httpClient
     this._refreshTokenAsked = false
     this._tokenRefreshed = false
-    this.authData = null
+    this.authData = auth || null
   }
   _shouldBeLogged() {
     if (this.authData === null) {

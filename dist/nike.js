@@ -19,13 +19,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var NikeClient = function () {
-  function NikeClient(httpClient) {
+  function NikeClient(httpClient, auth) {
     _classCallCheck(this, NikeClient);
 
     this._httpClient = httpClient;
     this._refreshTokenAsked = false;
     this._tokenRefreshed = false;
-    this.authData = null;
+    this.authData = auth || null;
   }
 
   _createClass(NikeClient, [{
