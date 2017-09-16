@@ -50,11 +50,21 @@ var NikeClient = function () {
   }, {
     key: '_handleResponse',
     value: function _handleResponse(data) {
-      this._refreshTokenAsked = false;
-      return Promise.resolve({
+      var response = {
         error: null,
         data: JSON.parse(data)
-      });
+      };
+      this._refreshTokenAsked = false;
+      if (response.data && response.data && response.data.errors) {
+        if (response.data.errors.filter(function (err) {
+          return err.code === 35;
+        }).length > 0) {
+          return Promise.reject({ statusCode: 401 });
+        }
+        response.error = data.errors[0];
+        response.data = null;
+      }
+      return Promise.resolve(response);
     }
   }, {
     key: '_Get',

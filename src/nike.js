@@ -24,11 +24,17 @@ export default class NikeClient {
     });
   }
   _handleResponse(data) {
-    this._refreshTokenAsked = false;
-    return Promise.resolve({
+    const response = {
       error: null,
       data: JSON.parse(data)
-    });
+    }
+    this._refreshTokenAsked = false
+    if (response.data && response.data && response.data.errors){
+      if (response.data.errors.filter((err)=> err.code === 35).length > 0){return Promise.reject({statusCode:401})}
+      response.error = data.errors[0]
+      response.data = null
+    }
+    return Promise.resolve(response)
   }
   _Get(uri, headers = null) {
     return this._httpClient
