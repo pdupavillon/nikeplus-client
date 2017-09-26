@@ -2,7 +2,7 @@
   "name": "nikeplus-client",
   "version": "1.0.0",
   "description": "Simple Nike+ client",
-  "main": "src/nike.js",
+  "main": "dist/nike.js",
   "scripts": {
     "build": "babel src -d dist --presets es2015,stage-2",
     "test": "babel-watch test.js --presets es2015,stage-2"
@@ -25,7 +25,9 @@
   ],
   "author": "Paul du Pavillon",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "uuid": "^3.1.0"
+  },
   "homepage": "https://github.com/pdupavillon/nikeplus-client",
   "devDependencies": {
     "babel-cli": "^6.26.0",

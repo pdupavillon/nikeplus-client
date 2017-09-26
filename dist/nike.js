@@ -14,6 +14,10 @@ var _tcx = require('./tcx');
 
 var _tcx2 = _interopRequireDefault(_tcx);
 
+var _v = require('uuid/v1');
+
+var _v2 = _interopRequireDefault(_v);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -111,17 +115,16 @@ var NikeClient = function () {
   }, {
     key: 'login',
     value: function login(email, password) {
-      var uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=295' + '&experienceVersion=256&uxid=com.nike.commerce.nikedotcom.web' + '&locale=en_US&backendEnvironment=identity&browser=Google%20Inc.&os=undefined' + '&mobile=false&native=false&visit=1';
+      var uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=313' + '&experienceVersion=272&uxid=com.nike.commerce.nikedotcom.web' + '&locale=en_US&backendEnvironment=identity&browser=Google%20Inc.&os=undefined' + '&mobile=false&native=false&visit=1&visitor=' + (0, _v2.default)();
       var data = {
-        "username": email,
-        "password": password,
-        "keepMeLoggedIn": true,
-        "client_id": "HlHa2Cje3ctlaOqnxvgZXNaAs7T9nAuH",
-        "ux_id": "com.nike.commerce.nikedotcom.web",
-        "grant_type": "password"
+        'username': email,
+        'password': password,
+        'keepMeLoggedIn': true,
+        'client_id': 'HlHa2Cje3ctlaOqnxvgZXNaAs7T9nAuH',
+        'ux_id': 'com.nike.commerce.nikedotcom.web',
+        'grant_type': 'password'
       };
       var that = this;
-
       return this._httpClient.Post(uri, null, data).then(function (data) {
         that.authData = JSON.parse(data);
         return Promise.resolve(that.authData);
