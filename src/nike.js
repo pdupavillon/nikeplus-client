@@ -60,8 +60,8 @@ export default class NikeClient {
       .catch((err) => this._handleRefreshToken(err, cb))
   }
   login(email, password) {
-    const uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=313' +
-      '&experienceVersion=272&uxid=com.nike.commerce.nikedotcom.web' +
+    const uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=315' +
+      '&experienceVersion=276&uxid=com.nike.commerce.nikedotcom.web' +
       '&locale=en_US&backendEnvironment=identity&browser=Google%20Inc.&os=undefined' +
       '&mobile=false&native=false&visit=1&visitor='+Uuid()
     const data = {

@@ -115,7 +115,7 @@ var NikeClient = function () {
   }, {
     key: 'login',
     value: function login(email, password) {
-      var uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=313' + '&experienceVersion=272&uxid=com.nike.commerce.nikedotcom.web' + '&locale=en_US&backendEnvironment=identity&browser=Google%20Inc.&os=undefined' + '&mobile=false&native=false&visit=1&visitor=' + (0, _v2.default)();
+      var uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=315' + '&experienceVersion=276&uxid=com.nike.commerce.nikedotcom.web' + '&locale=en_US&backendEnvironment=identity&browser=Google%20Inc.&os=undefined' + '&mobile=false&native=false&visit=1&visitor=' + (0, _v2.default)();
       var data = {
         'username': email,
         'password': password,
