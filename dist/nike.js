@@ -18,6 +18,12 @@ var _v = require('uuid/v1');
 
 var _v2 = _interopRequireDefault(_v);
 
+var _exceptions = require('./exceptions');
+
+var Errors = _interopRequireWildcard(_exceptions);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -36,7 +42,7 @@ var NikeClient = function () {
     key: '_shouldBeLogged',
     value: function _shouldBeLogged() {
       if (this.authData === null) {
-        throw 'You are not logged in';
+        throw new Errors.NikeError('You are not logged in');
       }
       this._tokenRefreshed = false;
     }
@@ -130,14 +136,19 @@ var NikeClient = function () {
         return Promise.resolve(that.authData);
       }).catch(function (err) {
         that.authData = null;
-        throw 'Can\'t log in ' + err;
+        var body = err.response.headers && err.response.headers['content-type'] === 'application/json' ? JSON.parse(err.response.body.trim().replace('\n', '')) : err.response.body;
+        var data = { code: err.statusCode, uri: err.response.request.uri.href, body: body };
+        if (err.statusCode === 400 && body.error === 'InvalidRequest') {
+          throw new Errors.NikeApiChange(data);
+        }
+        throw new Errors.NikeLoginError(data);
       });
     }
   }, {
     key: 'set_auth',
     value: function set_auth(data) {
       if (!data || !data.access_token || !data.refresh_token) {
-        throw 'Invalid login data';
+        throw new Errors.NikeError('Invalid login data');
       }
       this.authData = data;
     }

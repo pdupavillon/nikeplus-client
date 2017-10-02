@@ -1,6 +1,7 @@
 import Gpx from './gpx'
 import Tcx from './tcx'
 import Uuid from 'uuid/v1'
+import * as Errors from './exceptions'
 
 export default class NikeClient {
   constructor(httpClient, auth) {
@@ -11,7 +12,7 @@ export default class NikeClient {
   }
   _shouldBeLogged() {
     if (this.authData === null) {
-      throw 'You are not logged in';
+      throw new Errors.NikeError('You are not logged in');
     }
     this._tokenRefreshed = false;
   }
@@ -80,12 +81,15 @@ export default class NikeClient {
       })
       .catch((err) => {
         that.authData = null
-        throw 'Can\'t log in ' + err
+        let body = err.response.headers && err.response.headers['content-type'] === 'application/json' ? JSON.parse(err.response.body.trim().replace('\n', '')) : err.response.body
+        let data = {code:err.statusCode,uri:err.response.request.uri.href,body: body}
+        if (err.statusCode === 400 && body.error === 'InvalidRequest'){ throw new Errors.NikeApiChange(data) }
+        throw new Errors.NikeLoginError(data)
       });
   }
   set_auth(data) {
     if (!data || !data.access_token || !data.refresh_token) {
-      throw 'Invalid login data'
+      throw new Errors.NikeError('Invalid login data')
     }
     this.authData = data
   }
