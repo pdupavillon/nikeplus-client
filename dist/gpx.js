@@ -48,12 +48,12 @@ var Gpx = function () {
                 return val.type === 'longitude';
             })[0];
 
-            elevations.values.forEach(function (val, index) {
+            latitudes.values.forEach(function (item, index) {
                 return def.gpx.trk.trkseg.trkpt.push({
-                    '@lat': latitudes.values[index].value,
+                    '@lat': item.value,
                     '@lon': longitudes.values[index].value,
-                    ele: val.value,
-                    time: new Date(val.end_epoch_ms).toISOString()
+                    ele: elevations && elevations.values ? elevations.values[index].value : null,
+                    time: new Date(item.end_epoch_ms).toISOString()
                 });
             });
 

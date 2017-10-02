@@ -26,7 +26,7 @@ var XmlHelper = function () {
                     return k.startsWith('@');
                 });
                 var childs = Object.keys(value).filter(function (k) {
-                    return !k.startsWith('@');
+                    return !k.startsWith('@') && !!value[k];
                 });
                 var content = '';
                 node = '\t'.repeat(deep) + '<' + name;

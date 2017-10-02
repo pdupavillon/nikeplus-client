@@ -89,14 +89,14 @@ var Tcx = function () {
         }
       };
       var trackPoints = [];
-      elevations.values.forEach(function (val, index) {
+      latitudes.values.forEach(function (item, index) {
         return trackPoints.push({
-          Time: val.end_epoch_ms,
+          Time: item.end_epoch_ms,
           Position: {
             LatitudeDegrees: latitudes.values[index].value,
             LongitudeDegrees: longitudes.values[index].value
           },
-          AltitudeMeters: val.value
+          AltitudeMeters: elevations && elevations.values ? elevations.values[index].value : null
         });
       });
 
