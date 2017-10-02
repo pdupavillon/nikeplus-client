@@ -6,7 +6,7 @@ export default class XmlHelper {
         }
         else if (value instanceof Object){
             const attributes = Object.keys(value).filter((k) => k.startsWith('@'))
-            const childs = Object.keys(value).filter((k) => !k.startsWith('@'))
+            const childs = Object.keys(value).filter((k) => !k.startsWith('@') && !!value[k])
             let content = ''
             node = '\t'.repeat(deep)+'<'+name
             attributes.forEach((k) => node += ' '+k.substr(1)+'="'+value[k]+'"')

@@ -51,13 +51,13 @@ export default class Tcx {
       }
     }
     let trackPoints = []
-    elevations.values.forEach((val, index) => trackPoints.push({
-          Time: val.end_epoch_ms,
+    latitudes.values.forEach((item, index) => trackPoints.push({
+          Time: item.end_epoch_ms,
           Position: {
             LatitudeDegrees: latitudes.values[index].value,
             LongitudeDegrees: longitudes.values[index].value,
           },
-          AltitudeMeters: val.value,
+          AltitudeMeters: elevations && elevations.values ? elevations.values[index].value : null
     }))
 
     distances.values.forEach((d)=> {

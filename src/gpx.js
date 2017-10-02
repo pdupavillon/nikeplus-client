@@ -22,12 +22,12 @@ export default class Gpx {
         const latitudes = res.data.metrics.filter((val, index) => val.type === 'latitude')[0]
         const longitudes = res.data.metrics.filter((val, index) => val.type === 'longitude')[0]
 
-        elevations.values.forEach((val, index) => def.gpx.trk.trkseg.trkpt
+        latitudes.values.forEach((item, index) => def.gpx.trk.trkseg.trkpt
         .push({
-            '@lat':latitudes.values[index].value,
+            '@lat':item.value,
             '@lon':longitudes.values[index].value,
-            ele: val.value,
-            time: new Date(val.end_epoch_ms).toISOString()
+            ele: elevations && elevations.values ? elevations.values[index].value : null,
+            time: new Date(item.end_epoch_ms).toISOString()
         }))
 
         return XmlHelper.ConvertFromObj(def)
