@@ -79,7 +79,7 @@ export default class Tcx {
             LatitudeDegrees: latitudes[index].value,
             LongitudeDegrees: longitudes[index].value,
           },
-          AltitudeMeters: elevations ? elevations[index].value : null
+          AltitudeMeters: elevations && elevations.length > 0 && elevations.length > index ? elevations[index].value : null
     }));
 
     (distances || []).forEach((d)=> {
