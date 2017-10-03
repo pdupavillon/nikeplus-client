@@ -1,6 +1,6 @@
 import request from 'request-promise-native';
 
-class HttpClient{
+export class HttpClient{
     constructor(){
     }
     _call(method, uri, headers, data){
@@ -20,5 +20,3 @@ class HttpClient{
     Get = (uri, headers = null) => this._call('GET', uri, headers, null);
     Post = (uri, headers = null, data = null) => this._call('POST',uri, headers, data);
 }
-
-export default new HttpClient();

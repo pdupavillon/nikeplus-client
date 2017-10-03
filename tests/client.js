@@ -1,9 +1,11 @@
-import NikeClient from '../src/nike';
-import HttpClient from '../httpClient';
+import {NikeClient} from '../src/nike';
 
-let client = new NikeClient(HttpClient);
-client.login('----email----', '---password---')
-.then(client.me_summary.bind(client))
+let client = new NikeClient();
+let email = ''
+let pass = ''
+
+client.login(email, pass)
+// .then(client.me_summary.bind(client))
 //.then(client.me_summary.bind(client))
 //.then(client.me_detail.bind(client))
 //.then(client.me_snapshot.bind(client))

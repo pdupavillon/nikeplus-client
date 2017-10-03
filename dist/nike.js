@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.NikeClient = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -13,6 +14,8 @@ var _gpx2 = _interopRequireDefault(_gpx);
 var _tcx = require('./tcx');
 
 var _tcx2 = _interopRequireDefault(_tcx);
+
+var _httpClient = require('./httpClient');
 
 var _v = require('uuid/v1');
 
@@ -28,11 +31,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var NikeClient = function () {
-  function NikeClient(httpClient, auth) {
+var NikeClient = exports.NikeClient = function () {
+  function NikeClient(auth) {
     _classCallCheck(this, NikeClient);
 
-    this._httpClient = httpClient;
+    this._httpClient = new _httpClient.HttpClient();
     this._refreshTokenAsked = false;
     this._tokenRefreshed = false;
     this.authData = auth || null;
@@ -253,5 +256,3 @@ var NikeClient = function () {
 
   return NikeClient;
 }();
-
-exports.default = NikeClient;

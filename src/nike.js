@@ -1,11 +1,12 @@
 import Gpx from './gpx'
 import Tcx from './tcx'
+import {HttpClient} from './httpClient'
 import Uuid from 'uuid/v1'
 import * as Errors from './exceptions'
 
-export default class NikeClient {
-  constructor(httpClient, auth) {
-    this._httpClient = httpClient
+export class NikeClient {
+  constructor(auth) {
+    this._httpClient = new HttpClient()
     this._refreshTokenAsked = false
     this._tokenRefreshed = false
     this.authData = auth || null
