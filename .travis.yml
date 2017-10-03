@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+- '6'
+dist: trusty
+script:
+- npm run build
+deploy:
+  provider: npm
+  email: p.dupavillon@gmail.com
+  api_key:
+    secure: KaAbs1dTDw7zferLfwthzbIQt5sepNcbde7ZVFZiWWO83kxSBPkl9dRRPojdaiNJpGEQCsFOfGvtN7rOyZUBMKBVRF5RSfmWgebOjuGD1LeNU73hX9dxjTqtI885VZ6tjYE5De0+5OxhoidQQIbOy2u9gjbOl38U5uOcQpiX+eM=
