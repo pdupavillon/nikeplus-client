@@ -1,6 +1,6 @@
 package.json
 package-lock.json
-./tests
-./src
+tests/
+src/
 .travis.yml
 .npmignore
