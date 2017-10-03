@@ -14,6 +14,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var _getMetric = function _getMetric(data, name) {
+  var result = data.metrics.filter(function (val) {
+    return val.type === name;
+  });
+  return result && result.length === 1 && result[0].values && result[0].values.length > 0 ? result[0].values : null;
+};
+var _getSummary = function _getSummary(data, name) {
+  var result = data.summaries.filter(function (s) {
+    return s.metric === name;
+  });
+  return result && result.length === 1 && result[0] ? result[0] : null;
+};
+
 var Tcx = function () {
   function Tcx() {
     _classCallCheck(this, Tcx);
@@ -22,21 +35,13 @@ var Tcx = function () {
   _createClass(Tcx, null, [{
     key: 'ConvertFromNikeActivity',
     value: function ConvertFromNikeActivity(res) {
-      var elevations = res.data.metrics.filter(function (val, index) {
-        return val.type === 'elevation';
-      })[0];
-      var latitudes = res.data.metrics.filter(function (val, index) {
-        return val.type === 'latitude';
-      })[0];
-      var longitudes = res.data.metrics.filter(function (val, index) {
-        return val.type === 'longitude';
-      })[0];
-      var speeds = res.data.metrics.filter(function (val, index) {
-        return val.type === 'speed';
-      })[0];
-      var distances = res.data.metrics.filter(function (val, index) {
-        return val.type === 'distance';
-      })[0];
+      var data = res.data;
+      var elevations = _getMetric(data, 'elevation');
+      var latitudes = _getMetric(data, 'latitude');
+      var longitudes = _getMetric(data, 'longitude');
+      var speeds = _getMetric(data, 'speed');
+      var distances = _getMetric(data, 'distance');
+      var heartRates = _getMetric(data, 'heart_rate');
 
       var result = {
         TrainingCenterDatabase: {
@@ -51,22 +56,21 @@ var Tcx = function () {
             Activity: {
               '@Sport': 'Running',
               'Notes': 'Generated on : nike.bullrox.net',
-              Id: new Date(res.data.start_epoch_ms).toISOString(),
+              Id: new Date(data.start_epoch_ms).toISOString(),
               Lap: {
-                TotalTimeSeconds: res.data.active_duration_ms,
-                DistanceMeters: res.data.summaries.filter(function (s) {
-                  return s.metric === 'distance';
-                })[0].value * 1000,
-                MaximumSpeed: speeds.values.map(function (s) {
+                '@StartTime': new Date(data.start_epoch_ms).toISOString(),
+                TotalTimeSeconds: data.active_duration_ms,
+                DistanceMeters: _getSummary(data, 'distance').value * 1000,
+                MaximumSpeed: speeds ? speeds.map(function (s) {
                   return s.value;
                 }).reduce(function (prev, next) {
                   return Math.max(prev, next);
-                }) * 0.277778, //km/h --> m/s
-                Calories: res.data.summaries.filter(function (s) {
-                  return s.metric === 'calories';
-                })[0].value * 1000,
+                }) * 0.277778 : null, //km/h --> m/s
+                Calories: _getSummary(data, 'calories').value,
                 Intensity: 'Active',
                 TriggerMethod: 'Manual',
+                AverageHeartRateBpm: null,
+                MaximumHeartRateBpm: null,
                 Track: {
                   Trackpoint: []
                 }
@@ -89,18 +93,30 @@ var Tcx = function () {
         }
       };
       var trackPoints = [];
-      latitudes.values.forEach(function (item, index) {
+
+      if (_getSummary(data, 'heart_rate')) {
+        result.TrainingCenterDatabase.Activities.Activity.Lap.AverageHeartRateBpm = { Value: _getSummary(data, 'heart_rate').value };
+      }
+      if (heartRates) {
+        result.TrainingCenterDatabase.Activities.Activity.Lap.MaximumHeartRateBpm = { Value: heartRates.map(function (h) {
+            return h.value;
+          }).reduce(function (prev, next) {
+            return Math.max(prev, next);
+          }) };
+      }
+
+      latitudes.forEach(function (item, index) {
         return trackPoints.push({
           Time: item.end_epoch_ms,
           Position: {
-            LatitudeDegrees: latitudes.values[index].value,
-            LongitudeDegrees: longitudes.values[index].value
+            LatitudeDegrees: latitudes[index].value,
+            LongitudeDegrees: longitudes[index].value
           },
-          AltitudeMeters: elevations && elevations.values ? elevations.values[index].value : null
+          AltitudeMeters: elevations ? elevations[index].value : null
         });
       });
 
-      distances.values.forEach(function (d) {
+      (distances || []).forEach(function (d) {
         var matches = trackPoints.filter(function (t) {
           return t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms;
         });
@@ -109,7 +125,12 @@ var Tcx = function () {
         });
       });
 
-      speeds.values.forEach(function (d) {
+      // cumulated Distance
+      trackPoints.forEach(function (t, i) {
+        return !!t.DistanceMeters ? t.DistanceMeters += i > 0 ? trackPoints[i - 1].DistanceMeters : 0 : null;
+      });
+
+      (speeds || []).forEach(function (d) {
         var matches = trackPoints.filter(function (t) {
           return t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms;
         });
@@ -120,6 +141,15 @@ var Tcx = function () {
               Speed: d.value * 0.277778 //km/h --> m/s
             }
           };
+        });
+      });
+
+      (heartRates || []).forEach(function (d) {
+        var matches = trackPoints.filter(function (t) {
+          return t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms;
+        });
+        matches.forEach(function (m) {
+          return m.HeartRateBpm = { Value: d.value };
         });
       });
 

@@ -1,5 +1,5 @@
-import NikeClient from './src/nike';
-import HttpClient from './httpClient';
+import NikeClient from '../src/nike';
+import HttpClient from '../httpClient';
 
 let client = new NikeClient(HttpClient);
 client.login('----email----', '---password---')

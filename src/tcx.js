@@ -1,12 +1,23 @@
 import XmlHelper from './xmlHelper'
 
+const _getMetric = (data, name) => {
+  let result = data.metrics.filter((val) => val.type === name)
+  return (result && result.length === 1 && result[0].values && result[0].values.length > 0) ? result[0].values : null
+}
+const _getSummary = (data, name) => {
+  let result = data.summaries.filter((s) => s.metric === name)
+  return (result && result.length === 1 && result[0]) ? result[0] : null
+}
+
 export default class Tcx {
   static ConvertFromNikeActivity(res) {
-    const elevations = res.data.metrics.filter((val, index) => val.type === 'elevation')[0]
-    const latitudes = res.data.metrics.filter((val, index) => val.type === 'latitude')[0]
-    const longitudes = res.data.metrics.filter((val, index) => val.type === 'longitude')[0]
-    const speeds = res.data.metrics.filter((val, index) => val.type === 'speed')[0]
-    const distances = res.data.metrics.filter((val, index) => val.type === 'distance')[0]
+    const data = res.data
+    const elevations = _getMetric(data, 'elevation')
+    const latitudes = _getMetric(data, 'latitude')
+    const longitudes = _getMetric(data, 'longitude')
+    const speeds = _getMetric(data, 'speed')
+    const distances = _getMetric(data, 'distance')
+    const heartRates = _getMetric(data, 'heart_rate')
     
     let result = {
       TrainingCenterDatabase: {
@@ -21,14 +32,17 @@ export default class Tcx {
           Activity: {
             '@Sport': 'Running',
             'Notes': 'Generated on : nike.bullrox.net',
-            Id: new Date(res.data.start_epoch_ms).toISOString(),
+            Id: new Date(data.start_epoch_ms).toISOString(),
             Lap: {
-              TotalTimeSeconds: res.data.active_duration_ms,
-              DistanceMeters: res.data.summaries.filter((s) => s.metric === 'distance')[0].value * 1000,
-              MaximumSpeed: speeds.values.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 0.277778, //km/h --> m/s
-              Calories: res.data.summaries.filter((s) => s.metric === 'calories')[0].value * 1000,
+              '@StartTime':new Date(data.start_epoch_ms).toISOString(),
+              TotalTimeSeconds: data.active_duration_ms,
+              DistanceMeters: _getSummary(data, 'distance').value * 1000,
+              MaximumSpeed: speeds ? speeds.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 0.277778 : null, //km/h --> m/s
+              Calories: _getSummary(data,'calories').value,
               Intensity: 'Active',
               TriggerMethod: 'Manual',
+              AverageHeartRateBpm:null,
+              MaximumHeartRateBpm:null,
               Track: {
                 Trackpoint: []
               }
@@ -51,21 +65,32 @@ export default class Tcx {
       }
     }
     let trackPoints = []
-    latitudes.values.forEach((item, index) => trackPoints.push({
+
+    if (_getSummary(data, 'heart_rate')){
+      result.TrainingCenterDatabase.Activities.Activity.Lap.AverageHeartRateBpm = {Value: _getSummary(data, 'heart_rate').value}
+    }
+    if (heartRates){
+      result.TrainingCenterDatabase.Activities.Activity.Lap.MaximumHeartRateBpm = {Value: heartRates.map((h) => h.value).reduce((prev, next) => Math.max(prev, next))}
+    }
+
+    latitudes.forEach((item, index) => trackPoints.push({
           Time: item.end_epoch_ms,
           Position: {
-            LatitudeDegrees: latitudes.values[index].value,
-            LongitudeDegrees: longitudes.values[index].value,
+            LatitudeDegrees: latitudes[index].value,
+            LongitudeDegrees: longitudes[index].value,
           },
-          AltitudeMeters: elevations && elevations.values ? elevations.values[index].value : null
-    }))
+          AltitudeMeters: elevations ? elevations[index].value : null
+    }));
 
-    distances.values.forEach((d)=> {
+    (distances || []).forEach((d)=> {
       const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
       matches.forEach((m) => m.DistanceMeters = (d.value / matches.length) * 1000)
-    })
+    });
+    
+    // cumulated Distance
+    trackPoints.forEach((t,i)=> ((!!t.DistanceMeters) ? t.DistanceMeters += (i > 0 ? trackPoints[i-1].DistanceMeters : 0) : null));
 
-    speeds.values.forEach((d)=> {
+    (speeds || []).forEach((d)=> {
       const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
       matches.forEach((m) => m.Extensions = {
             TPX: {
@@ -73,7 +98,12 @@ export default class Tcx {
               Speed: d.value * 0.277778 //km/h --> m/s
             }        
       })
-    })
+    });
+
+    (heartRates || []).forEach((d)=> {
+      const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
+      matches.forEach((m) => m.HeartRateBpm = {Value:d.value})
+    });
 
     trackPoints.forEach((t) => t.Time = new Date(t.Time).toISOString())
     result.TrainingCenterDatabase.Activities.Activity.Lap.Track.Trackpoint = trackPoints
