@@ -26,7 +26,7 @@ export default class Gpx {
         .push({
             '@lat':item.value,
             '@lon':longitudes.values[index].value,
-            ele: elevations && elevations.values ? elevations.values[index].value : null,
+            ele: elevations && elevations.values && elevations.values.length > index ? elevations.values[index].value : null,
             time: new Date(item.end_epoch_ms).toISOString()
         }))
 
