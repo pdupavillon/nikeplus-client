@@ -1,5 +1,5 @@
-import Gpx from './gpx'
-import Tcx from './tcx'
+import {Gpx} from './gpx'
+import {Tcx} from './tcx'
 import {HttpClient} from './httpClient'
 import Uuid from 'uuid/v1'
 import * as Errors from './exceptions'

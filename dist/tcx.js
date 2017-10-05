@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.Tcx = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -10,24 +11,13 @@ var _xmlHelper = require('./xmlHelper');
 
 var _xmlHelper2 = _interopRequireDefault(_xmlHelper);
 
+var _nikeHelper = require('./nikeHelper');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _getMetric = function _getMetric(data, name) {
-  var result = data.metrics.filter(function (val) {
-    return val.type === name;
-  });
-  return result && result.length === 1 && result[0].values && result[0].values.length > 0 ? result[0].values : null;
-};
-var _getSummary = function _getSummary(data, name) {
-  var result = data.summaries.filter(function (s) {
-    return s.metric === name;
-  });
-  return result && result.length === 1 && result[0] ? result[0] : null;
-};
-
-var Tcx = function () {
+var Tcx = exports.Tcx = function () {
   function Tcx() {
     _classCallCheck(this, Tcx);
   }
@@ -36,12 +26,12 @@ var Tcx = function () {
     key: 'ConvertFromNikeActivity',
     value: function ConvertFromNikeActivity(res) {
       var data = res.data;
-      var elevations = _getMetric(data, 'elevation');
-      var latitudes = _getMetric(data, 'latitude');
-      var longitudes = _getMetric(data, 'longitude');
-      var speeds = _getMetric(data, 'speed');
-      var distances = _getMetric(data, 'distance');
-      var heartRates = _getMetric(data, 'heart_rate');
+      var elevations = _nikeHelper.NikeHelper.GetMetric(data, 'elevation');
+      var latitudes = _nikeHelper.NikeHelper.GetMetric(data, 'latitude');
+      var longitudes = _nikeHelper.NikeHelper.GetMetric(data, 'longitude');
+      var speeds = _nikeHelper.NikeHelper.GetMetric(data, 'speed');
+      var distances = _nikeHelper.NikeHelper.GetMetric(data, 'distance');
+      var heartRates = _nikeHelper.NikeHelper.GetMetric(data, 'heart_rate');
 
       var result = {
         TrainingCenterDatabase: {
@@ -60,13 +50,13 @@ var Tcx = function () {
               Lap: {
                 '@StartTime': new Date(data.start_epoch_ms).toISOString(),
                 TotalTimeSeconds: data.active_duration_ms,
-                DistanceMeters: _getSummary(data, 'distance').value * 1000,
-                MaximumSpeed: speeds ? speeds.map(function (s) {
+                DistanceMeters: !!_nikeHelper.NikeHelper.GetSummary(data, 'distance') ? _nikeHelper.NikeHelper.GetSummary(data, 'distance').value * 1000 : null,
+                MaximumSpeed: !!speeds ? speeds.map(function (s) {
                   return s.value;
                 }).reduce(function (prev, next) {
                   return Math.max(prev, next);
                 }) * 0.277778 : null, //km/h --> m/s
-                Calories: _getSummary(data, 'calories').value,
+                Calories: !!_nikeHelper.NikeHelper.GetSummary(data, 'calories') ? _nikeHelper.NikeHelper.GetSummary(data, 'calories').value : null,
                 Intensity: 'Active',
                 TriggerMethod: 'Manual',
                 AverageHeartRateBpm: null,
@@ -94,8 +84,8 @@ var Tcx = function () {
       };
       var trackPoints = [];
 
-      if (_getSummary(data, 'heart_rate')) {
-        result.TrainingCenterDatabase.Activities.Activity.Lap.AverageHeartRateBpm = { Value: _getSummary(data, 'heart_rate').value };
+      if (!!_nikeHelper.NikeHelper.GetSummary(data, 'heart_rate')) {
+        result.TrainingCenterDatabase.Activities.Activity.Lap.AverageHeartRateBpm = { Value: _nikeHelper.NikeHelper.GetSummary(data, 'heart_rate').value };
       }
       if (heartRates) {
         result.TrainingCenterDatabase.Activities.Activity.Lap.MaximumHeartRateBpm = { Value: heartRates.map(function (h) {
@@ -163,5 +153,3 @@ var Tcx = function () {
 
   return Tcx;
 }();
-
-exports.default = Tcx;

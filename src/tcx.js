@@ -1,23 +1,15 @@
 import XmlHelper from './xmlHelper'
+import { NikeHelper } from './nikeHelper'
 
-const _getMetric = (data, name) => {
-  let result = data.metrics.filter((val) => val.type === name)
-  return (result && result.length === 1 && result[0].values && result[0].values.length > 0) ? result[0].values : null
-}
-const _getSummary = (data, name) => {
-  let result = data.summaries.filter((s) => s.metric === name)
-  return (result && result.length === 1 && result[0]) ? result[0] : null
-}
-
-export default class Tcx {
+export class Tcx {
   static ConvertFromNikeActivity(res) {
     const data = res.data
-    const elevations = _getMetric(data, 'elevation')
-    const latitudes = _getMetric(data, 'latitude')
-    const longitudes = _getMetric(data, 'longitude')
-    const speeds = _getMetric(data, 'speed')
-    const distances = _getMetric(data, 'distance')
-    const heartRates = _getMetric(data, 'heart_rate')
+    const elevations = NikeHelper.GetMetric(data, 'elevation')
+    const latitudes = NikeHelper.GetMetric(data, 'latitude')
+    const longitudes = NikeHelper.GetMetric(data, 'longitude')
+    const speeds = NikeHelper.GetMetric(data, 'speed')
+    const distances = NikeHelper.GetMetric(data, 'distance')
+    const heartRates = NikeHelper.GetMetric(data, 'heart_rate')
     
     let result = {
       TrainingCenterDatabase: {
@@ -36,9 +28,9 @@ export default class Tcx {
             Lap: {
               '@StartTime':new Date(data.start_epoch_ms).toISOString(),
               TotalTimeSeconds: data.active_duration_ms,
-              DistanceMeters: _getSummary(data, 'distance').value * 1000,
-              MaximumSpeed: speeds ? speeds.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 0.277778 : null, //km/h --> m/s
-              Calories: _getSummary(data,'calories').value,
+              DistanceMeters: !!NikeHelper.GetSummary(data, 'distance') ? NikeHelper.GetSummary(data, 'distance').value * 1000 : null,
+              MaximumSpeed: !!speeds ? speeds.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 0.277778 : null, //km/h --> m/s
+              Calories: !!NikeHelper.GetSummary(data,'calories') ? NikeHelper.GetSummary(data,'calories').value : null,
               Intensity: 'Active',
               TriggerMethod: 'Manual',
               AverageHeartRateBpm:null,
@@ -66,8 +58,8 @@ export default class Tcx {
     }
     let trackPoints = []
 
-    if (_getSummary(data, 'heart_rate')){
-      result.TrainingCenterDatabase.Activities.Activity.Lap.AverageHeartRateBpm = {Value: _getSummary(data, 'heart_rate').value}
+    if (!!NikeHelper.GetSummary(data, 'heart_rate')){
+      result.TrainingCenterDatabase.Activities.Activity.Lap.AverageHeartRateBpm = {Value: NikeHelper.GetSummary(data, 'heart_rate').value}
     }
     if (heartRates){
       result.TrainingCenterDatabase.Activities.Activity.Lap.MaximumHeartRateBpm = {Value: heartRates.map((h) => h.value).reduce((prev, next) => Math.max(prev, next))}

@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.Gpx = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -10,11 +11,13 @@ var _xmlHelper = require('./xmlHelper');
 
 var _xmlHelper2 = _interopRequireDefault(_xmlHelper);
 
+var _nikeHelper = require('./nikeHelper');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Gpx = function () {
+var Gpx = exports.Gpx = function () {
     function Gpx() {
         _classCallCheck(this, Gpx);
     }
@@ -38,21 +41,15 @@ var Gpx = function () {
                     }
                 }
             };
-            var elevations = res.data.metrics.filter(function (val, index) {
-                return val.type === 'elevation';
-            })[0];
-            var latitudes = res.data.metrics.filter(function (val, index) {
-                return val.type === 'latitude';
-            })[0];
-            var longitudes = res.data.metrics.filter(function (val, index) {
-                return val.type === 'longitude';
-            })[0];
+            var elevations = _nikeHelper.NikeHelper.GetMetric(res.data, 'elevation');
+            var latitudes = _nikeHelper.NikeHelper.GetMetric(res.data, 'latitude');
+            var longitudes = _nikeHelper.NikeHelper.GetMetric(res.data, 'longitude');
 
-            latitudes.values.forEach(function (item, index) {
+            latitudes.forEach(function (item, index) {
                 return def.gpx.trk.trkseg.trkpt.push({
                     '@lat': item.value,
-                    '@lon': longitudes.values[index].value,
-                    ele: elevations && elevations.values && elevations.values.length > index ? elevations.values[index].value : null,
+                    '@lon': longitudes[index].value,
+                    ele: elevations && elevations.length > index ? elevations[index].value : null,
                     time: new Date(item.end_epoch_ms).toISOString()
                 });
             });
@@ -63,5 +60,3 @@ var Gpx = function () {
 
     return Gpx;
 }();
-
-exports.default = Gpx;

@@ -9,11 +9,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _gpx = require('./gpx');
 
-var _gpx2 = _interopRequireDefault(_gpx);
-
 var _tcx = require('./tcx');
-
-var _tcx2 = _interopRequireDefault(_tcx);
 
 var _httpClient = require('./httpClient');
 
@@ -242,14 +238,14 @@ var NikeClient = exports.NikeClient = function () {
     key: 'me_activity_to_gpx',
     value: function me_activity_to_gpx(id) {
       return this.me_activity_detail(id).then(function (run) {
-        return Promise.resolve(_gpx2.default.ConvertFromNikeActivity(run));
+        return Promise.resolve(_gpx.Gpx.ConvertFromNikeActivity(run));
       });
     }
   }, {
     key: 'me_activity_to_tcx',
     value: function me_activity_to_tcx(id) {
       return this.me_activity_detail(id).then(function (run) {
-        return Promise.resolve(_tcx2.default.ConvertFromNikeActivity(run));
+        return Promise.resolve(_tcx.Tcx.ConvertFromNikeActivity(run));
       });
     }
   }]);

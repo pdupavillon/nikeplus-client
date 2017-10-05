@@ -1,6 +1,7 @@
 import XmlHelper from './xmlHelper'
+import {NikeHelper} from './nikeHelper'
 
-export default class Gpx {
+export class Gpx {
     static ConvertFromNikeActivity(res){
         let def = {
             gpx:{
@@ -18,15 +19,15 @@ export default class Gpx {
                 }
             }
         }
-        const elevations = res.data.metrics.filter((val, index) => val.type === 'elevation')[0]
-        const latitudes = res.data.metrics.filter((val, index) => val.type === 'latitude')[0]
-        const longitudes = res.data.metrics.filter((val, index) => val.type === 'longitude')[0]
+        const elevations = NikeHelper.GetMetric(res.data,'elevation')
+        const latitudes = NikeHelper.GetMetric(res.data,'latitude')
+        const longitudes = NikeHelper.GetMetric(res.data,'longitude')
 
-        latitudes.values.forEach((item, index) => def.gpx.trk.trkseg.trkpt
+        latitudes.forEach((item, index) => def.gpx.trk.trkseg.trkpt
         .push({
             '@lat':item.value,
-            '@lon':longitudes.values[index].value,
-            ele: elevations && elevations.values && elevations.values.length > index ? elevations.values[index].value : null,
+            '@lon':longitudes[index].value,
+            ele: elevations && elevations.length > index ? elevations[index].value : null,
             time: new Date(item.end_epoch_ms).toISOString()
         }))
 
