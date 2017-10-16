@@ -93,7 +93,8 @@ export class Tcx {
     });
 
     (heartRates || []).forEach((d)=> {
-      const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
+      let matches = trackPoints.filter((t)=> (t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms) ||
+                                              (t.Time <= d.end_epoch_ms && t.HeartRateBpm === undefined))//sometimes heartRates datetime are out of bound of lat/lng records
       matches.forEach((m) => m.HeartRateBpm = {Value:d.value})
     });
 
