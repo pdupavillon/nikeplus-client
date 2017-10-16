@@ -136,8 +136,8 @@ var Tcx = exports.Tcx = function () {
 
       (heartRates || []).forEach(function (d) {
         var matches = trackPoints.filter(function (t) {
-          return t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms;
-        });
+          return t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms || t.Time <= d.end_epoch_ms && t.HeartRateBpm === undefined;
+        }); //sometimes heartRates datetime are out of bound of lat/lng records
         matches.forEach(function (m) {
           return m.HeartRateBpm = { Value: d.value };
         });
