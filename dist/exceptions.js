@@ -18,6 +18,7 @@ var NikeLoginError = function (_Error) {
 
         var _this = _possibleConstructorReturn(this, (NikeLoginError.__proto__ || Object.getPrototypeOf(NikeLoginError)).call(this, 'Can\'t login'));
 
+        _this.name = 'NikeLoginError';
         _this.data = data;
         Error.captureStackTrace(_this, NikeLoginError);
         return _this;
@@ -34,6 +35,7 @@ var NikeError = function (_Error2) {
 
         var _this2 = _possibleConstructorReturn(this, (NikeError.__proto__ || Object.getPrototypeOf(NikeError)).call(this, message));
 
+        _this2.name = 'NikeError';
         Error.captureStackTrace(_this2, NikeError);
         return _this2;
     }
@@ -49,6 +51,7 @@ var NikeApiChange = function (_Error3) {
 
         var _this3 = _possibleConstructorReturn(this, (NikeApiChange.__proto__ || Object.getPrototypeOf(NikeApiChange)).call(this, 'Api url or result change'));
 
+        _this3.name = 'NikeApiChange';
         _this3.data = data;
         Error.captureStackTrace(_this3, NikeApiChange);
         return _this3;
