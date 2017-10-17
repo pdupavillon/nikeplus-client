@@ -70,18 +70,22 @@ export class Tcx {
           Position: {
             LatitudeDegrees: latitudes[index].value,
             LongitudeDegrees: longitudes[index].value,
-          },
-          AltitudeMeters: elevations && elevations.length > 0 && elevations.length > index ? elevations[index].value : null
+          }
+          //AltitudeMeters: elevations && elevations.length > 0 && elevations.length > index ? elevations[index].value : null //Elevation is not altitude
     }));
 
     (distances || []).forEach((d)=> {
-      const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
-      matches.forEach((m) => m.DistanceMeters = (d.value / matches.length) * 1000)
+      const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms && t.DistanceMeters === undefined)
+      matches.forEach((m) => m.DistanceMeters = ((d.value * 1000) / matches.length))
+    });
+
+    //cumulative distance
+    let sum = 0;
+    trackPoints.forEach((t) => {
+      sum += t.DistanceMeters >= 0 ? t.DistanceMeters : 0
+      t.DistanceMeters = t.DistanceMeters >= 0 ? sum : null
     });
     
-    // cumulated Distance
-    trackPoints.forEach((t,i)=> ((!!t.DistanceMeters) ? t.DistanceMeters += (i > 0 ? trackPoints[i-1].DistanceMeters : 0) : null));
-
     (speeds || []).forEach((d)=> {
       const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
       matches.forEach((m) => m.Extensions = {
