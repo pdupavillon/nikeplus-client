@@ -1,6 +1,6 @@
 {
   "name": "nikeplus-client",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Simple Nike+ client",
   "main": "dist/nike.js",
   "scripts": {
@@ -28,9 +28,10 @@
   "author": "Paul du Pavillon",
   "license": "MIT",
   "dependencies": {
-    "uuid": "^3.1.0",
+    "geolib": "^2.0.23",
     "request": "^2.81.0",
-    "request-promise-native": "^1.0.4"
+    "request-promise-native": "^1.0.4",
+    "uuid": "^3.1.0"
   },
   "homepage": "https://github.com/pdupavillon/nikeplus-client",
   "devDependencies": {

@@ -1,5 +1,6 @@
 import XmlHelper from './xmlHelper'
 import { NikeHelper } from './nikeHelper'
+import GeoLib from 'geolib'
 
 export class Tcx {
   static ConvertFromNikeActivity(res) {
@@ -74,9 +75,15 @@ export class Tcx {
           //AltitudeMeters: elevations && elevations.length > 0 && elevations.length > index ? elevations[index].value : null //Elevation is not altitude
     }));
 
-    (distances || []).forEach((d)=> {
-      const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms && t.DistanceMeters === undefined)
-      matches.forEach((m) => m.DistanceMeters = ((d.value * 1000) / matches.length))
+    // (distances || []).forEach((d)=> {
+    //   const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms && t.DistanceMeters === undefined)
+    //   matches.forEach((m) => m.DistanceMeters = ((d.value * 1000) / matches.length))
+    // });
+
+    trackPoints.forEach((t, i) => {
+      if (i-1 >= 0){
+        t.DistanceMeters = GeoLib.getDistance({latitude:trackPoints[i-1].Position.LatitudeDegrees, longitude:trackPoints[i-1].Position.LongitudeDegrees},{latitude:t.Position.LatitudeDegrees, longitude:t.Position.LongitudeDegrees}, 1, 3)
+      }
     });
 
     //cumulative distance
@@ -85,7 +92,7 @@ export class Tcx {
       sum += t.DistanceMeters >= 0 ? t.DistanceMeters : 0
       t.DistanceMeters = t.DistanceMeters >= 0 ? sum : null
     });
-    
+
     (speeds || []).forEach((d)=> {
       const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms)
       matches.forEach((m) => m.Extensions = {

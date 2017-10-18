@@ -13,6 +13,10 @@ var _xmlHelper2 = _interopRequireDefault(_xmlHelper);
 
 var _nikeHelper = require('./nikeHelper');
 
+var _geolib = require('geolib');
+
+var _geolib2 = _interopRequireDefault(_geolib);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -105,13 +109,15 @@ var Tcx = exports.Tcx = function () {
           } });
       });
 
-      (distances || []).forEach(function (d) {
-        var matches = trackPoints.filter(function (t) {
-          return t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms && t.DistanceMeters === undefined;
-        });
-        matches.forEach(function (m) {
-          return m.DistanceMeters = d.value * 1000 / matches.length;
-        });
+      // (distances || []).forEach((d)=> {
+      //   const matches = trackPoints.filter((t)=> t.Time >= d.start_epoch_ms && t.Time <= d.end_epoch_ms && t.DistanceMeters === undefined)
+      //   matches.forEach((m) => m.DistanceMeters = ((d.value * 1000) / matches.length))
+      // });
+
+      trackPoints.forEach(function (t, i) {
+        if (i - 1 >= 0) {
+          t.DistanceMeters = _geolib2.default.getDistance({ latitude: trackPoints[i - 1].Position.LatitudeDegrees, longitude: trackPoints[i - 1].Position.LongitudeDegrees }, { latitude: t.Position.LatitudeDegrees, longitude: t.Position.LongitudeDegrees }, 1, 3);
+        }
       });
 
       //cumulative distance
