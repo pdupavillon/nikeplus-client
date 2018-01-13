@@ -62,20 +62,20 @@ export class NikeClient {
       .catch((err) => this._handleRefreshToken(err, cb))
   }
   login(email, password) {
-    const uri = 'https://unite.nike.com/loginWithSetCookie?appVersion=315' +
-      '&experienceVersion=276&uxid=com.nike.commerce.nikedotcom.web' +
+    const uri = 'https://unite.nike.com/login?appVersion=358' +
+      '&experienceVersion=308&uxid=com.nike.commerce.nikedotcom.web' +
       '&locale=en_US&backendEnvironment=identity&browser=Google%20Inc.&os=undefined' +
       '&mobile=false&native=false&visit=1&visitor='+Uuid()
     const data = {
       'username': email,
       'password': password,
       'keepMeLoggedIn': true,
-      'client_id': 'HlHa2Cje3ctlaOqnxvgZXNaAs7T9nAuH',
+      'client_id': 'QH8exE5gyCCyR0HbcQRRWklauH89tnQG',
       'ux_id': 'com.nike.commerce.nikedotcom.web',
       'grant_type': 'password'
     };
     let that = this;
-    return this._httpClient.Post(uri, null, data)
+    return this._httpClient.Post(uri, { Referer: "https://awr.svs.nike.com/activity/login" }, data)
       .then((data) => {
         that.authData = JSON.parse(data)
         return Promise.resolve(that.authData)
