@@ -66,7 +66,7 @@ export class Tcx {
       result.TrainingCenterDatabase.Activities.Activity.Lap.MaximumHeartRateBpm = {Value: heartRates.map((h) => h.value).reduce((prev, next) => Math.max(prev, next))}
     }
 
-    latitudes.forEach((item, index) => trackPoints.push({
+    (latitudes||[]).forEach((item, index) => trackPoints.push({
           Time: item.end_epoch_ms,
           Position: {
             LatitudeDegrees: latitudes[index].value,

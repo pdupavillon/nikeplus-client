@@ -99,7 +99,7 @@ var Tcx = exports.Tcx = function () {
           }) };
       }
 
-      latitudes.forEach(function (item, index) {
+      (latitudes || []).forEach(function (item, index) {
         return trackPoints.push({
           Time: item.end_epoch_ms,
           Position: {
