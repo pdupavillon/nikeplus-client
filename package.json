@@ -1,6 +1,6 @@
 {
   "name": "nikeplus-client",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "Simple Nike+ client",
   "main": "dist/nike.js",
   "scripts": {
