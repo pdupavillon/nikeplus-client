@@ -28,7 +28,7 @@ export class Tcx {
             Id: new Date(data.start_epoch_ms).toISOString(),
             Lap: {
               '@StartTime':new Date(data.start_epoch_ms).toISOString(),
-              TotalTimeSeconds: data.active_duration_ms,
+              TotalTimeSeconds: (data.active_duration_ms / 1000.0).toString(),
               DistanceMeters: !!NikeHelper.GetSummary(data, 'distance') ? NikeHelper.GetSummary(data, 'distance').value * 1000 : null,
               MaximumSpeed: !!speeds ? speeds.map((s) => s.value).reduce((prev, next) => Math.max(prev, next)) * 0.277778 : null, //km/h --> m/s
               Calories: !!NikeHelper.GetSummary(data,'calories') ? NikeHelper.GetSummary(data,'calories').value : null,
@@ -66,7 +66,7 @@ export class Tcx {
       result.TrainingCenterDatabase.Activities.Activity.Lap.MaximumHeartRateBpm = {Value: heartRates.map((h) => h.value).reduce((prev, next) => Math.max(prev, next))}
     }
 
-    latitudes.forEach((item, index) => trackPoints.push({
+    (latitudes||[]).forEach((item, index) => trackPoints.push({
           Time: item.end_epoch_ms,
           Position: {
             LatitudeDegrees: latitudes[index].value,

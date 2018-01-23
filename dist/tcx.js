@@ -53,7 +53,7 @@ var Tcx = exports.Tcx = function () {
               Id: new Date(data.start_epoch_ms).toISOString(),
               Lap: {
                 '@StartTime': new Date(data.start_epoch_ms).toISOString(),
-                TotalTimeSeconds: data.active_duration_ms,
+                TotalTimeSeconds: (data.active_duration_ms / 1000.0).toString(),
                 DistanceMeters: !!_nikeHelper.NikeHelper.GetSummary(data, 'distance') ? _nikeHelper.NikeHelper.GetSummary(data, 'distance').value * 1000 : null,
                 MaximumSpeed: !!speeds ? speeds.map(function (s) {
                   return s.value;
@@ -99,7 +99,7 @@ var Tcx = exports.Tcx = function () {
           }) };
       }
 
-      latitudes.forEach(function (item, index) {
+      (latitudes || []).forEach(function (item, index) {
         return trackPoints.push({
           Time: item.end_epoch_ms,
           Position: {
